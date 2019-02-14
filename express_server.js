@@ -13,14 +13,16 @@ function generateRandomString() {
  return Math.random().toString(36).substr(2, 6);
 }
 
-//
+//parses the body to be readable
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 
+//getting root directory
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
 
+//gets urls and converts it into a json string
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
