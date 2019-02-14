@@ -8,13 +8,13 @@
   <title>TinyApp</title>
 </head>
 <% include partials/_header.ejs %>
-<a href = '#'>Create new tiny URL</a> 
+<a href = >Create new tiny URL</a> 
 <body style="font-size:20px; padding:50px;">
     <!-- Add EJS code here -->
     <%for (let key in urls) {%>
     <ul>
         <li>
-            <%= key %> : <%= urls[key] %>
+           <a href = "<%= urls[key] %>"><%= key %></a> : <%= urls[key] %>
         </li>
     </ul>    
  <%}%>
