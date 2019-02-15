@@ -50,21 +50,31 @@ app.get("/urls/:shortURL", (req, res) => {
 app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
-
+//generates random string and redirects to root
 app.post("/urls", (req, res) => {
   console.log(req.body);  
-  res.send("Ok");
   let ranStr = generateRandomString();
   urlDatabase[ranStr] = req.body.longURL;    
-  res.redirect('/urls/:shortURL');
+  res.redirect('/urls');
   console.log(urlDatabase);
 });
-
+//deleting urls
 app.post("/urls/:shortURL/delete", (req, res) => {
   delete urlDatabase[req.params.shortURL];
   res.redirect("/urls");
 });
+//edit button
+app.post("/urls/:shortURL/edit", (req, res) => {
+let templateVars = {shortURL: req.params.shortURL};
+  res.render('urls_show', templateVars);
+})
 
+
+app.post('/urls/:id', (req, res) => {
+  let templateVars = {urls: urlDatabase};
+urlDatabase[req.params.id] = req.body.newURL;
+res.render('urls_index', templateVars);
+})
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
