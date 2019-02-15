@@ -16,8 +16,8 @@
         </li>
         <li>
             <%= longURL %>
-            <form method='POST' action='/urls/<%=shortURL%>'>  
-                <button type="submit" class="btn btn-primary">Update</button>
+            <form method='POST' action='/urls/:<%=shortURL%>'>  
+                <button type="button" class="btn btn-primary">Update</button>
                 <input name="newURL" type="text">
             </form>
         </li>
