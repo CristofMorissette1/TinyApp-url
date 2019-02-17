@@ -1,15 +1,16 @@
 <header><h1>The OG Tiny App </h1></header>
 
-<%if(username){%>
-    <h1>Logged in as</h1><%=username%>
+<% if (user) { %>
+    <h1>Logged in as </h1>
+    <h2><%=urls.email%></h2>
+    
     <form method='POST' action='/logout'>
         <button type='submit' class='btn btn-primary' name='username'>Logout</button>
         </form>
 
 <%} else {%>
 
-    <form method='POST' action='/login'>
-    <button type='submit' class="btn btn-primary"><h1></h1>Sign in</button>
-    <input name='username' type='text'>
-    </form>
-<%}%>
+    <h1>TinyApp</h1>
+    <h4><a href ='/login'>Login | <a href='/registration'>Register</a></h4>
+    <%}%>
+   
