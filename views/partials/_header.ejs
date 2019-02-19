@@ -1,8 +1,10 @@
 <header><h1>The OG Tiny App </h1></header>
 
+
+<body>
 <% if (user) { %>
     <h1>Logged in as </h1>
-    <h2><%=urls.email%></h2>
+    <h2><%=user.email%></h2>
     
     <form method='POST' action='/logout'>
         <button type='submit' class='btn btn-primary' name='username'>Logout</button>
@@ -13,4 +15,9 @@
     <h1>TinyApp</h1>
     <h4><a href ='/login'>Login | <a href='/registration'>Register</a></h4>
     <%}%>
+</body>
+
+<footer>
+    <h3>Coded by : Cristof Morissette</h3>
+</footer>
    

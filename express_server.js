@@ -1,10 +1,14 @@
 var express = require("express");
 var app = express();
-var cookieParser = require('cookie-parser');
+var cookieSession = require('cookie-session');
 var PORT = 8080; // default port 8080
 const bcrypt = require('bcrypt');
 app.set("view engine", "ejs");
-app.use(cookieParser());
+app.use(cookieSession({
+  name: 'session',
+  keys: ['Cristof'],
+  maxAge: 24 * 60 * 60 * 1000 
+}))
 const urlDatabase = {
   "b2xVn2": {'longURL': "http://www.lighthouselabs.ca", 'user_id': 'userRandomID'},
   "9sm5xK": {'longURL': "http://www.google.com", 'user_id': 'userRandomID'}
@@ -61,23 +65,24 @@ app.get("/urls.json", (req, res) => {
 
 app.get("/urls", (req, res) => {
   const perURLS = {};
+  const currUserId = req.session.user_id;
+  const currUser = users[currUserId];
   for(let key in urlDatabase) {
-    if (urlDatabase[key].user_id === req.cookies['user_id']) {
+    if (urlDatabase[key].user_id === req.session.user_id) {
     perURLS[key] = urlDatabase[key];
-    }
-    console.log(perURLS[key]);
+    };
   }
 
   let templateVars = { 
     urls: urlDatabase, 
-    user: req.cookies['user_id'],
+    user: currUser,
     newURLS: perURLS
   } 
   
   
-  const currUserId = req.cookies['user_id'];
+  
    //const currUser = users[currUserId];
-   if (req.cookies['user_id']){
+   if (req.session.user_id){
     res.render('urls_index', templateVars);
     } else {
     res.redirect("/login");
@@ -85,13 +90,13 @@ app.get("/urls", (req, res) => {
   });
 
 app.get("/urls/new", (req, res) => {
-  const currUserId = req.cookies['user_id'];
+  const currUserId = req.session.user_id;
   const currUser = users[currUserId];
   let templateVars = {
     urls: urlDatabase, 
     user: currUser,
   };
-  if (req.cookies['user_id']) {
+  if (req.session.user_id) {
   res.render('urls_news', templateVars)
   } else {
     res.redirect('/login')
@@ -104,7 +109,7 @@ app.get("/u/:shortURL", (req, res) => {
 });
 
 app.get("/urls/:shortURL", (req, res) => {
-  const currUserId = req.cookies['user_id'];
+  const currUserId = req.session.user_id;
   const currUser = users[currUserId];
   let templateVars = { 
     shortURL: req.params.shortURL, 
@@ -131,21 +136,19 @@ function emailcheck(email1) {
 }
 
   if (!req.body.email || !req.body.password) {
-    console.log('first')
     res.sendStatus(400);
   }
   // i need to compare the email in my datbase to the email that gets registerd
   else if (!checkEmail(req.body.email) == true) {
-    console.log('second')
     users[userId] = {
       id: userId,
       email: req.body.email,
       password: hashedPassword
     } 
-    res.cookie('user_id', userId); 
+
+    req.session.user_id = userId 
     res.redirect('/urls');
   } else {
-    console.log('third')
     res.sendStatus(400);
   }
 })
@@ -156,7 +159,7 @@ app.get("/hello", (req, res) => {
 
 //generates random string and redirects to root
 app.post("/urls", (req, res) => {  
-  let cook = req.cookies['user_id'];
+  let cook = req.session.user_id;
   let ranStr = generateRandomString();
   urlDatabase[ranStr] = {
     longURL: req.body.longURL,
@@ -171,7 +174,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 });
 //edit button
 app.post("/urls/:shortURL/edit", (req, res) => {
-  const currUserId = req.cookies['user_id'];
+  const currUserId = req.session.user_id;
   const currUser = users[currUserId];
   let templateVars = {
     shortURL: req.params.shortURL,
@@ -182,7 +185,7 @@ app.post("/urls/:shortURL/edit", (req, res) => {
 
 
 app.post('/urls/:id', (req, res) => {
-  const currUserId = req.cookies['user_id'];
+  const currUserId = req.session.user_id;
   const currUser = users[currUserId];
   let templateVars = {
     urls: urlDatabase,
@@ -193,9 +196,9 @@ res.render('urls_index', templateVars);
 })
 
 app.get('/login', (req, res) => {
-  // templateVars = {
-  //   user: user[req['user_id']]
-  //   }
+   templateVars = {
+     user: users[req['user_id']]
+     }
   res.render('login');
 })
 
@@ -204,7 +207,7 @@ var email = req.body.email;
 var password = req.body.password;
 let idd = userIdFromEmail(req.body.email)
   if (checkEmail(email) === email && bcrypt.compareSync(password, users[idd].password)) {
-  res.cookie('user_id', password);
+  req.session.user_id =  userIdFromEmail(req.body.email);
 } else if (checkPassword(password) != password) {
   res.sendStatus('wrong password');
 } else if (checkEmail(email) != email) {
@@ -216,8 +219,7 @@ res.redirect('/urls');
 })
 
 app.post('/logout', (req, res) => {
-  res.cookie('user_id', req.body.users);
-  res.clearCookie('user_id');
+  req.session.user_id = null;
   res.redirect('/urls')
 })
 app.listen(PORT, () => {
