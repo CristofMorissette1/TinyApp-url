@@ -55,7 +55,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 //getting root directory
 app.get("/", (req, res) => {
-  res.send("Hello!");
+  res.redirect("/urls");
 });
 
 //gets urls and converts it into a json string
@@ -78,7 +78,8 @@ app.get("/urls", (req, res) => {
     user: currUser,
     newURLS: perURLS
   } 
-  
+  console.log(templateVars);
+  console.log(req.session.user_id);
   
   
    //const currUser = users[currUserId];
@@ -103,9 +104,10 @@ app.get("/urls/new", (req, res) => {
   }
   });
 
+  
 app.get("/u/:shortURL", (req, res) => {
   const longURL = urlDatabase[req.params.shortURL]['username'];
-  res.redirect(longURL);
+  res.redirect('/longURL');
 });
 
 app.get("/urls/:shortURL", (req, res) => {
@@ -180,7 +182,7 @@ app.post("/urls/:shortURL/edit", (req, res) => {
     shortURL: req.params.shortURL,
     user: currUser
   };
-  res.render('urls_show', templateVars);
+  res.render('/urls_show', templateVars);
 })
 
 
@@ -191,8 +193,9 @@ app.post('/urls/:id', (req, res) => {
     urls: urlDatabase,
     user: currUser
   };
-urlDatabase[req.params.id] = req.body.newURL;
-res.render('urls_index', templateVars);
+  console.log(req.params.id);
+urlDatabase[req.params.id].longURL = req.body.newURL;
+res.redirect('/urls');
 })
 
 app.get('/login', (req, res) => {
@@ -209,18 +212,16 @@ let idd = userIdFromEmail(req.body.email)
   if (checkEmail(email) === email && bcrypt.compareSync(password, users[idd].password)) {
   req.session.user_id =  userIdFromEmail(req.body.email);
 } else if (checkPassword(password) != password) {
-  res.sendStatus('wrong password');
+  res.render('login', {error: 'wrong password'});
 } else if (checkEmail(email) != email) {
-  res.sendStatus('wrong email');
-} else {
-  res.sendStatus(403);
+  res.render('login', {error: 'Wrong email'});
 }
 res.redirect('/urls');
 })
 
 app.post('/logout', (req, res) => {
-  req.session.user_id = null;
-  res.redirect('/urls')
+  req.session = null;
+  res.redirect('/login')
 })
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);

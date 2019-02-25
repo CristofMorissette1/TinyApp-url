@@ -14,6 +14,13 @@
 <input name='password' type='password' placeholder='password'>
 </form>
 
+<% if (locals) {%>
+<div>
+<%= locals.error %>
+<%}%>
+</div>
+
+
 <form method='GET' action='/registration'>
 <button type='submit' class='btn btn-primary'>register</button>
 </form>

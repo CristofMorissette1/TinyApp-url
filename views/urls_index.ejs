@@ -14,7 +14,7 @@
     <%for (let key in newURLS) {%>
     <ul>
         <li>
-           <a href = "<%= newURLS[key] %>"><%= key %></a> : <%= newURLS[key].longURL %> <form method="POST" action="/urls/<%= key %>/delete"><button type="submit">Delete</button></form>
+           <a href ="<%= newURLS[key].longURL %>"><%= key %></a> : <%= newURLS[key].longURL %> <form method="POST" action="/urls/<%= key %>/delete"><button type="submit">Delete</button></form>
            <a href='/urls/<%= key %>'>Edit</a> 
         </li>
     </ul>    
